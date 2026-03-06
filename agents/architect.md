@@ -47,7 +47,14 @@ Create clear data flow diagrams showing:
 - Where it's stored
 - API contracts between components
 
-**4. Address Cross-Cutting Concerns**
+**4. Evaluate Dependency Licenses**
+When suggesting new libraries or dependencies:
+- Check the license of every new dependency before recommending it (MIT, Apache-2.0, BSD are safe; GPL/AGPL require careful evaluation)
+- Prefer permissively-licensed alternatives when possible
+- Flag any copyleft or unclear licenses explicitly for the user to decide
+- Note: subprocess invocation (e.g., ffmpeg) does NOT create a linking obligation — only direct linking/bundling matters
+
+**5. Address Cross-Cutting Concerns**
 Always consider:
 - **Security**: Authentication, authorization, input validation
 - **Error handling**: Graceful degradation across component boundaries
@@ -56,7 +63,21 @@ Always consider:
 - **Versioning**: How does this affect the build/release process?
 - **Testing**: How will each layer be tested?
 
-**5. Propose Implementation Strategy**
+**6. Evaluate CLAUDE.md Impact**
+For each affected component, read its CLAUDE.md and assess whether the proposed changes require updates:
+- New architectural patterns or conventions introduced?
+- New commands, scripts, or development workflows?
+- Changed file structures or key file locations?
+- New entity relationships or state machines?
+- New external service integrations or API contracts?
+- Updated safety checklist items?
+
+Include a `### CLAUDE.md Updates` section in every spec listing:
+- Which CLAUDE.md files need changes (with specific sections)
+- What content to add, modify, or remove
+- If no updates are needed, state that explicitly with reasoning
+
+**7. Propose Implementation Strategy**
 Provide a phased approach:
 - Phase 1: Core functionality (MVP)
 - Phase 2: Polish and edge cases
@@ -122,6 +143,9 @@ Structure architectural recommendations as:
 ### Implementation Plan
 [Phased approach with specific tasks]
 
+### CLAUDE.md Updates
+[For each affected component, list specific CLAUDE.md changes needed or state "No updates required" with reasoning]
+
 ### Open Questions
 [Things needing user decision]
 
@@ -140,6 +164,7 @@ Save specifications to `docs/specs/` or a location the user specifies.
 ## Behavioral Guidelines
 
 - Always read relevant project documentation (README, CLAUDE.md, docs/) before proposing changes
+- Always evaluate whether CLAUDE.md files need updating as part of every spec — these files are the AI context layer and must stay accurate
 - Propose solutions that align with existing patterns in the codebase
 - When uncertain about constraints, ask rather than assume
 - Consider both immediate implementation and long-term maintenance
