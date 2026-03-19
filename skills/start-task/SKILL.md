@@ -1,58 +1,80 @@
 ---
 name: start-task
-description: Rebase from main, find a task in the project's task/build plan file, and enter plan mode to start implementation.
+description: Rebase from main, find a ready task in beads (bd), claim it, create a branch, and enter plan mode to start implementation.
 user-invocable: true
-argument-hint: [feature or task name from the task plan]
+argument-hint: [task ID or description from bd ready]
 ---
 
-Start implementing a task from the project's task plan.
+Start implementing a task tracked by beads (`bd` CLI).
 
-## Finding the Task Plan
+## Prerequisites Check
 
-Look for a task/build plan file in these common locations (in order):
-- `BUILD_PLAN.md`
-- `TODO.md`
-- `docs/BUILD_PLAN.md`
-- `docs/TODO.md`
-- `TASKS.md`
-- Any `.md` file with "plan" or "task" in the name under `docs/`
+Before anything else, verify the toolchain:
 
-If no task plan file is found, ask the user for the path.
+1. **Check if `bd` is installed:**
+   ```bash
+   which bd
+   ```
+   If not found, install it:
+   ```bash
+   npm install -g @beads/bd
+   ```
+
+2. **Check if beads is initialized in this project:**
+   ```bash
+   ls .beads/
+   ```
+   If `.beads/` doesn't exist, initialize:
+   ```bash
+   bd init
+   ```
+   Follow the prompts (role selection, git hooks). For most projects, accept defaults.
 
 ## Steps
 
-1. **Rebase from local main** — bring the current branch up to date with the latest tested state:
-   ```
+1. **Rebase from local main** — bring the current branch up to date:
+   ```bash
    git rebase main
    ```
-   - Rebase against the **local** `main` branch (not `origin/main`), since local main may have commits not yet pushed to remote.
-   - If the rebase has conflicts, stop and inform the user. Do NOT force-resolve conflicts.
-   - If the branch is already up to date, proceed.
+   - Rebase against **local** `main` (not `origin/main`), since local main may have commits not yet pushed.
+   - If conflicts occur, stop and inform the user. Do NOT force-resolve.
 
-2. **Read the task plan** file found above.
+2. **Find a ready task** — use `bd ready` to list tasks with no open blockers:
+   ```bash
+   bd ready --json
+   ```
+   - If `$ARGUMENTS` is provided, match it against the ready list (by ID or title substring).
+   - If multiple matches, show candidates and ask the user to pick.
+   - If no match or no ready tasks, tell the user and stop.
+   - If no argument was given, show the ready list and ask which task to start.
 
-3. **Find the matching task** — search for an unchecked line (`- [ ]`) that best matches: `$ARGUMENTS`
-   - Match by substring or fuzzy relevance.
-   - If multiple lines could match, show the candidates and ask the user to pick one.
-   - If no match is found, tell the user and stop.
+3. **Show task details** before claiming:
+   ```bash
+   bd show <id> --json
+   ```
+   Display: title, description, priority, dependencies, spec link (if any).
 
-4. **Show the matched task** to the user, including any sub-tasks and linked spec if present.
+4. **Claim the task** — atomically set assignee + in_progress:
+   ```bash
+   bd update <id> --claim --json
+   ```
+   This is a single atomic command. Do NOT use separate assign + status update.
 
-5. **Create a task branch** — create and checkout a new branch for this task:
-   - Derive a short kebab-case slug from the task description (e.g., "Add trial license support" -> `trial-license-support`)
-   - Choose the prefix based on the nature of the task:
-     - `feat/` — new feature or capability
-     - `fix/` — bug fix
-     - `build/` — build system, CI, packaging changes
-     - `test/` — adding or updating tests
-     - `chore/` — maintenance, refactoring, docs, config changes
+5. **Create a task branch** — checkout a new branch:
+   - Derive a short kebab-case slug from the task title
+   - Choose prefix based on task type/nature:
+     - `feat/` — feature
+     - `fix/` — bug
+     - `build/` — build system, CI
+     - `test/` — tests
+     - `chore/` — maintenance, refactoring, docs
    - Create the branch: `git checkout -b <prefix>/<slug>`
-   - If unsure which prefix fits, ask the user.
+   - If unsure which prefix, ask the user.
 
-6. **Check for a linked spec** — if the task line contains a markdown link to a spec (e.g., `See [spec](../specs/some-spec.md)`), read that spec file to understand the full requirements.
+6. **Check for a linked spec** — if the task has a `spec_id` field or mentions a spec path, read that file.
 
-7. **Enter plan mode** — use `EnterPlanMode` to begin planning the implementation. In plan mode:
-   - Read the spec (if one exists) and any relevant source files
-   - Understand the current state of the codebase for the affected areas
+7. **Enter plan mode** — use `EnterPlanMode` to begin planning the implementation:
+   - Read the spec (if one exists) and relevant source files
+   - Understand the current codebase state for affected areas
    - Design the implementation approach
    - Present a step-by-step plan for user approval
