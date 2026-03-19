@@ -6,17 +6,18 @@ A Claude Code plugin for parallel workspace development workflows. Includes an a
 
 ### As a Claude Plugin (recommended)
 
-Install directly from the repo:
+Clone the repo anywhere, then install from that path:
 
 ```bash
-claude plugin install ~/Documents/myclaude
+git clone git@github.com:varn0/devflow.git
+claude plugin install /path/to/devflow
 ```
 
 ### Manual (symlinks)
 
 ```bash
-ln -sf ~/Documents/myclaude/agents ~/.claude/agents
-ln -sf ~/Documents/myclaude/skills ~/.claude/skills
+ln -sf /path/to/devflow/agents ~/.claude/agents
+ln -sf /path/to/devflow/skills ~/.claude/skills
 ```
 
 ## Agents
