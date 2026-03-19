@@ -7,19 +7,8 @@ argument-hint: [feature or problem description]
 
 Start an architectural discussion about: $ARGUMENTS
 
-Use the architect subagent. Begin by:
+Use the architect subagent. The subagent has the full process built in — just dispatch it with the user's request.
 
-1. **Understanding the current relevant systems** (read code if needed)
-   - Look at related components across the codebase
-   - Read project documentation (CLAUDE.md, README, docs/) for architectural context and constraints
-
-2. **Ask clarifying questions** about requirements and constraints
-   - What are the success criteria?
-   - What are the failure modes?
-   - How does this interact with existing systems?
-
-3. **Do NOT propose solutions** until the problem is well-understood
-
-This is a dialogue, not a one-shot answer. We explore the problem space together before designing.
-
-When ready to formalize, create a spec in `docs/specs/` (or wherever the project keeps specifications).
+<HARD-GATE>
+Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to EVERY feature regardless of perceived simplicity.
+</HARD-GATE>
