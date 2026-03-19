@@ -1,0 +1,15 @@
+{
+  "name": "varno-devflow",
+  "description": "Parallel workspace development workflows with architect, task tracking (beads), and multi-worktree support",
+  "owner": {
+    "name": "CucoStudio"
+  },
+  "plugins": [
+    {
+      "name": "varno-devflow",
+      "description": "Parallel workspace development workflows",
+      "version": "0.1.0",
+      "source": "./"
+    }
+  ]
+}
