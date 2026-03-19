@@ -1,17 +1,23 @@
-# Claude Code Agents & Skills Library
+# varno-devflow
 
-Reusable, project-agnostic agents and skills for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Drop them into any project's `~/.claude/` directory to get a consistent set of workflows.
+A Claude Code plugin for parallel workspace development workflows. Includes an architect agent, task tracking via beads (bd), and multi-worktree support.
 
 ## Setup
 
-Symlink into your Claude Code config:
+### As a Claude Plugin (recommended)
+
+Install directly from the repo:
+
+```bash
+claude plugin install ~/Documents/myclaude
+```
+
+### Manual (symlinks)
 
 ```bash
 ln -sf ~/Documents/myclaude/agents ~/.claude/agents
 ln -sf ~/Documents/myclaude/skills ~/.claude/skills
 ```
-
-Or copy individual files into an existing `~/.claude/` setup.
 
 ## Agents
 
