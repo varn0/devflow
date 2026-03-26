@@ -56,14 +56,14 @@ claude --plugin-dir /path/to/devflow
 These agents and skills are designed around a three-workspace workflow using git worktrees and iTerm split panes, with three Claude Code sessions running simultaneously:
 
 ```
-┌─────────────────┬─────────────────┬─────────────────┐
-│   Workspace A   │   Workspace B   │      Main       │
-│   (feature)     │   (feature)     │  (integration)  │
-│                 │                 │                 │
-│  Build features │  Build features │  Merge & test   │
+┌─────────────────┬─────────────────┬───────────────────┐
+│   Workspace A   │   Workspace B   │      Main         │
+│   (feature)     │   (feature)     │  (integration)    │
+│                 │                 │                   │
+│  Build features │  Build features │  Merge & test     │
 │  independently  │  independently  │  Resolve conflicts│
-│                 │                 │  Small tasks    │
-└─────────────────┴─────────────────┴─────────────────┘
+│                 │                 │  Small tasks      │
+└─────────────────┴─────────────────┴───────────────────┘
 ```
 
 ### How it works
