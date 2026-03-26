@@ -49,7 +49,7 @@ claude --plugin-dir /path/to/devflow
 | `close-task` | `/close-task` | Mark a task as done in the plan file and commit |
 | `merge-workspace` | `/merge-workspace` | Merge a git worktree branch into main with preview and confirmation |
 | `visual-qa` | `/visual-qa` | Visual QA testing with Playwright screenshots |
-| `release-notes` | `/release-notes` | Generate user-friendly release notes from git history since last tag |
+| `write-release-notes` | `/write-release-notes` | Generate user-friendly release notes from git history since last tag |
 
 ## Parallel Workspace Workflow
 

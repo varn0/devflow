@@ -1,11 +1,11 @@
 ---
-name: release-notes
+name: write-release-notes
 description: Use when preparing a release, writing changelog entries, or the user asks for release notes. Reads git history since the last production tag and generates user-friendly release notes covering only features and fixes.
 user-invocable: true
 argument-hint: [tag or version to diff from, e.g. v1.2.0]
 ---
 
-Generate user-friendly release notes from git history since the last production tag.
+Generate user-friendly release notes from git history since the last production tag and write them to `RELEASE_NOTES.md`.
 
 ## How It Works
 
@@ -37,7 +37,7 @@ Generate user-friendly release notes from git history since the last production 
    - **New** — features, new capabilities
    - **Fixed** — bug fixes, corrections
 
-5. **Write the release notes** in this format:
+5. **Write the release notes** to `RELEASE_NOTES.md` in the repo root. If the file already exists, prepend the new section above existing content. Use this format:
 
    ```markdown
    ## What's New in <version>
