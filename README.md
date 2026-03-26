@@ -6,18 +6,31 @@ A Claude Code plugin for parallel workspace development workflows. Includes an a
 
 ### As a Claude Plugin (recommended)
 
-Clone the repo anywhere, then install from that path:
+1. Add the repo as a local marketplace:
 
-```bash
-git clone git@github.com:varn0/devflow.git
-claude plugin install /path/to/devflow
+   ```
+   /plugin marketplace add /path/to/devflow
+   ```
+
+2. Install the plugin:
+
+   ```
+   /plugin install varno-devflow
+   ```
+
+### From GitHub
+
+```
+/plugin marketplace add varn0/devflow
+/plugin install varno-devflow
 ```
 
-### Manual (symlinks)
+### For development
+
+Load the plugin directly without installing (changes picked up with `/reload-plugins`):
 
 ```bash
-ln -sf /path/to/devflow/agents ~/.claude/agents
-ln -sf /path/to/devflow/skills ~/.claude/skills
+claude --plugin-dir /path/to/devflow
 ```
 
 ## Agents
@@ -36,6 +49,7 @@ ln -sf /path/to/devflow/skills ~/.claude/skills
 | `close-task` | `/close-task` | Mark a task as done in the plan file and commit |
 | `merge-workspace` | `/merge-workspace` | Merge a git worktree branch into main with preview and confirmation |
 | `visual-qa` | `/visual-qa` | Visual QA testing with Playwright screenshots |
+| `release-notes` | `/release-notes` | Generate user-friendly release notes from git history since last tag |
 
 ## Parallel Workspace Workflow
 
