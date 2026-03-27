@@ -30,20 +30,21 @@ Mark a task as completed in beads (`bd` CLI).
 
 3. **Close the task** with a reason:
    ```bash
-   bd close <id> --reason "<short description of what was done>" --json
+   bd close <id> -r "<short description of what was done>" --suggest-next --json
    ```
    Derive the reason from the work completed (commit messages, branch name, or user input).
+   The `--suggest-next` flag causes the JSON output to include any newly unblocked issues.
 
-4. **Commit** any beads-related changes if git hooks didn't auto-commit:
+4. **Check for uncommitted work** — remind the user to commit implementation changes:
    ```bash
    git status
    ```
-   If there are uncommitted changes in `.beads/`, commit them:
-   ```bash
-   git add .beads/
-   git commit -m "plan: complete \"<short task description>\" (<id>)"
-   ```
-   Include the beads ID in the commit message for traceability.
+   If there are uncommitted working-tree changes (code files), remind the user to commit their implementation work before moving on. Do NOT commit `.beads/` directory changes — bd uses Dolt for its own state management.
+
+5. **Suggest next work** — if the `bd close` JSON output from step 3 contains a non-empty list of newly unblocked issues, display them:
+   - Show each issue's ID, title, and priority.
+   - Ask the user if they want to start one of these tasks (which would be a `/start-task` invocation).
+   - If no newly unblocked issues, skip this step silently.
 
 ## What This Skill Does NOT Do
 
