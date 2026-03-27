@@ -1,6 +1,6 @@
 ---
 name: close-task
-description: Mark a task as completed in beads (bd) and commit the change.
+description: Mark a task as completed in beads (bd) and suggest next work.
 user-invocable: true
 argument-hint: [task ID or description to mark as done]
 ---
