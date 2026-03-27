@@ -30,7 +30,7 @@ You MUST use TaskCreate to create a task for each of these items BEFORE starting
 3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
 4. **Propose 2-3 approaches** — with trade-offs and your recommendation
 5. **Present design** — in sections scaled to complexity, get user approval after each section
-6. **Write spec document** — save to `docs/specs/` (or wherever the project keeps specs) and commit
+6. **Write spec document and create bd tasks** — save spec to `docs/specs/` (or wherever the project keeps specs), commit, then create implementation tasks in bd (if bd is available — best-effort, not a gate)
 7. **Spec review loop** — dispatch a general-purpose subagent to review the spec for completeness and consistency; fix issues and re-dispatch until approved (max 3 iterations, then surface to human)
 8. **User reviews written spec** — ask user to review the spec file before proceeding
 9. **Transition to implementation** — invoke writing-plans skill to create implementation plan
@@ -77,6 +77,7 @@ digraph architect {
 ### Understanding the Problem
 
 - Check out the current project state first (files, docs, recent commits, CLAUDE.md)
+- Check if `bd` is available for task tracking: run `which bd && bd info --json`. Note whether bd is operational — this determines whether implementation tasks can be created in bd later. If bd is not available, the agent works normally but skips task creation.
 - Before asking detailed questions, **assess scope**: if the request describes multiple independent subsystems, flag this immediately. Don't spend questions refining details of a feature that needs to be decomposed first.
 - If the project is too large for a single spec, help the user decompose into sub-features: what are the independent pieces, how do they relate, what order should they be built? Then architect the first sub-feature through the normal design flow. Each sub-feature gets its own spec → plan → implementation cycle.
 
@@ -166,6 +167,32 @@ Include a `### CLAUDE.md Updates` section in every spec listing:
 
 - Write the validated design (spec) to `docs/specs/` (or user-specified location)
 - Commit the design document to git
+
+**Create implementation tasks in bd (if bd is available):**
+
+If `bd` was detected as available in step 1, create trackable issues from the spec's Implementation Plan:
+
+- If the work has multiple phases/tasks:
+  1. Create a parent epic:
+     ```bash
+     bd create "<feature name>" -t epic -d "<overview>" --design-file <spec-path> --json
+     ```
+  2. For each task in the implementation plan:
+     ```bash
+     bd create "<task title>" -d "<description>" --parent <epic-id> --json
+     ```
+  3. Set ordering dependencies where the plan indicates sequencing:
+     ```bash
+     bd dep add <blocked-id> <blocker-id>
+     ```
+     (First arg depends on second arg. Example: `bd dep add bd-5 bd-4` means bd-5 is blocked by bd-4.)
+- If the work is a single task, create one issue:
+  ```bash
+  bd create "<task title>" -d "<description>" --design-file <spec-path> --json
+  ```
+- Display the created task tree to the user for confirmation.
+- If any `bd create` command fails mid-way, display what was created so far and let the user decide how to proceed.
+- If bd is not available, skip this section entirely — it is best-effort, not a gate.
 
 **Spec Review Loop:**
 After writing the spec document:
