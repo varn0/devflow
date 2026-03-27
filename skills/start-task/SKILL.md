@@ -15,20 +15,14 @@ Before anything else, verify the toolchain:
    ```bash
    which bd
    ```
-   If not found, install it:
-   ```bash
-   npm install -g @beads/bd
-   ```
+   If not found, tell the user to install bd. Do NOT auto-install — bd requires a Dolt server, making installation non-trivial.
 
-2. **Check if beads is initialized in this project:**
+2. **Check bd database is discoverable:**
    ```bash
-   ls .beads/
+   bd info --json
    ```
-   If `.beads/` doesn't exist, initialize:
-   ```bash
-   bd init
-   ```
-   Follow the prompts (role selection, git hooks). For most projects, accept defaults.
+   If this fails, the `.beads/*.db` file is missing or corrupted. Tell the user to run `bd init` or check their Dolt server is running.
+   Note: this checks for a valid database file, not Dolt server connectivity.
 
 ## Steps
 
@@ -71,9 +65,18 @@ Before anything else, verify the toolchain:
    - Create the branch: `git checkout -b <prefix>/<slug>`
    - If unsure which prefix, ask the user.
 
-6. **Check for a linked spec** — if the task has a `spec_id` field or mentions a spec path, read that file.
+6. **Check for a linked spec** — inspect the `bd show` JSON output:
+   - Check for a `design` field first. If present, read that file.
+   - Fall back to `spec_id` if `design` is absent. If present, read that file.
+   - If neither exists, proceed without a spec.
 
-7. **Enter plan mode** — use `EnterPlanMode` to begin planning the implementation:
+7. **Load project context** — run `bd prime` to get AI-optimized workflow context:
+   ```bash
+   bd prime
+   ```
+   Review the output for relevant project state (open blockers, related issues, recent activity). Use this context to inform the implementation plan in plan mode.
+
+8. **Enter plan mode** — use `EnterPlanMode` to begin planning the implementation:
    - Read the spec (if one exists) and relevant source files
    - Understand the current codebase state for affected areas
    - Design the implementation approach
