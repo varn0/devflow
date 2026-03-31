@@ -2,9 +2,16 @@
 
 A Claude Code plugin for parallel workspace development workflows. Includes an architect agent, task tracking via beads (bd), and multi-worktree support.
 
-## Setup
+## Installation
 
-### As a Claude Plugin (recommended)
+### From GitHub (recommended)
+
+```
+/plugin marketplace add varn0/devflow
+/plugin install varno-devflow
+```
+
+### From a local clone
 
 1. Add the repo as a local marketplace:
 
@@ -17,13 +24,6 @@ A Claude Code plugin for parallel workspace development workflows. Includes an a
    ```
    /plugin install varno-devflow
    ```
-
-### From GitHub
-
-```
-/plugin marketplace add varn0/devflow
-/plugin install varno-devflow
-```
 
 ### For development
 
