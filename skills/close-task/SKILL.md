@@ -1,54 +1,59 @@
 ---
 name: close-task
-description: Mark a task as completed in beads (bd) and suggest next work.
+description: Wrap up work on a GitLab issue — commit, push, create MR. Issue closes automatically on MR merge.
 user-invocable: true
-argument-hint: [task ID or description to mark as done]
+argument-hint: [issue number or branch name]
 ---
 
-Mark a task as completed in beads (`bd` CLI).
+Wrap up work on a GitLab issue and prepare it for merge.
+
+Issues close automatically when the MR merges (via `Closes #N` in the MR description). This skill does NOT close issues manually.
 
 ## Steps
 
-1. **Find the task to close** — identify the beads issue:
-   ```bash
-   bd show --current --json
-   ```
-   - If `$ARGUMENTS` is a beads ID (e.g., `bd-a1b2`), use it directly.
-   - If `$ARGUMENTS` is text, search for a matching in-progress task:
-     ```bash
-     bd list --status in_progress --json
-     ```
-     Match by substring. If multiple matches, show candidates and ask the user to pick.
-   - If no argument, use `bd show --current` to find the active task.
-   - If no match found, tell the user and stop.
+1. **Identify the issue** — determine which issue this work is for:
+   - If `$ARGUMENTS` is a number, that's the issue number.
+   - If on a branch like `feat/42-some-slug`, extract `42` as the issue number.
+   - If ambiguous, ask the user.
 
-2. **Show the task** for confirmation:
-   ```bash
-   bd show <id> --json
-   ```
-   Display title, status, and ask user to confirm this is the right task to close.
-
-3. **Close the task** with a reason:
-   ```bash
-   bd close <id> -r "<short description of what was done>" --suggest-next --json
-   ```
-   Derive the reason from the work completed (commit messages, branch name, or user input).
-   The `--suggest-next` flag causes the JSON output to include any newly unblocked issues.
-
-4. **Check for uncommitted work** — remind the user to commit implementation changes:
+2. **Check for uncommitted work:**
    ```bash
    git status
    ```
-   If there are uncommitted working-tree changes (code files), remind the user to commit their implementation work before moving on. Do NOT commit `.beads/` directory changes — bd uses Dolt for its own state management.
+   If there are uncommitted changes, remind the user to commit before proceeding. Do NOT auto-commit — the user controls their commits.
 
-5. **Suggest next work** — if the `bd close` JSON output from step 3 contains a non-empty list of newly unblocked issues, display them:
-   - Show each issue's ID, title, and priority.
-   - Ask the user if they want to start one of these tasks (which would be a `/start-task` invocation).
-   - If no newly unblocked issues, skip this step silently.
+3. **Push the branch:**
+   ```bash
+   git push -u origin HEAD
+   ```
+
+4. **Create a merge request** (if one doesn't already exist):
+   - First check for an existing MR:
+     ```bash
+     glab mr list --head=$(git branch --show-current)
+     ```
+   - If no MR exists, create one:
+     ```bash
+     glab mr create --fill --assignee @me --title "<title>" --description "Closes #<issue-number>"
+     ```
+     - Derive the title from the branch name or issue title.
+     - The `Closes #N` in the description ensures the issue auto-closes on merge.
+     - If the project uses MR templates, `--fill` will pick them up.
+   - If an MR already exists, show its URL and status.
+
+5. **Suggest next work** — check for other open issues:
+   ```bash
+   glab issue list --assignee @me --per-page=5
+   ```
+   - If the user has other assigned issues, show them.
+   - Otherwise, show unassigned issues:
+     ```bash
+     glab issue list --assignee=none --per-page=5
+     ```
+   - Ask if they want to start one (which would be a `/start-task` invocation).
 
 ## What This Skill Does NOT Do
 
-- **Does NOT merge branches** — that's the `merge-workspace` skill
-- **Does NOT push to remote** — the user decides when to push
-- **Does NOT delete branches** — branch cleanup is separate
-- **Does NOT close child tasks** — only the specified task. If it has open children, `bd` will warn you.
+- **Does NOT close issues** — issues close automatically when the MR merges (via `Closes #N`).
+- **Does NOT merge branches** — that's the `merge-workspace` skill or the GitLab UI.
+- **Does NOT delete branches** — GitLab can auto-delete source branches on merge.

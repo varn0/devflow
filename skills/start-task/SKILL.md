@@ -1,28 +1,19 @@
 ---
 name: start-task
-description: Rebase from main, find a ready task in beads (bd), claim it, create a branch, and enter plan mode to start implementation.
+description: Use glab to list open GitLab issues, let user pick one, assign it, create a branch, and brainstorm the approach.
 user-invocable: true
-argument-hint: [task ID or description from bd ready]
+argument-hint: [issue number or title substring]
 ---
 
-Start implementing a task tracked by beads (`bd` CLI).
+Start implementing a task tracked as a GitLab issue.
 
 ## Prerequisites Check
 
-Before anything else, verify the toolchain:
-
-1. **Check if `bd` is installed:**
+1. **Check if `glab` is installed and authenticated:**
    ```bash
-   which bd
+   glab auth status
    ```
-   If not found, tell the user to install bd. Do NOT auto-install — bd requires a Dolt server, making installation non-trivial.
-
-2. **Check bd database is discoverable:**
-   ```bash
-   bd info --json
-   ```
-   If this fails, the `.beads/*.db` file is missing or corrupted. Tell the user to run `bd init` or check their Dolt server is running.
-   Note: this checks for a valid database file, not Dolt server connectivity.
+   If not found or not authenticated, tell the user to install/configure glab. Do NOT auto-install.
 
 ## Steps
 
@@ -33,51 +24,51 @@ Before anything else, verify the toolchain:
    - Rebase against **local** `main` (not `origin/main`), since local main may have commits not yet pushed.
    - If conflicts occur, stop and inform the user. Do NOT force-resolve.
 
-2. **Find a ready task** — use `bd ready` to list tasks with no open blockers:
+2. **Find an open issue** — list available work:
    ```bash
-   bd ready --json
+   glab issue list --mine=false --assignee=none --per-page=20
    ```
-   - If `$ARGUMENTS` is provided, match it against the ready list (by ID or title substring).
+   - If `$ARGUMENTS` is a number, fetch that issue directly:
+     ```bash
+     glab issue view <number>
+     ```
+   - If `$ARGUMENTS` is text, filter by title substring from the list.
    - If multiple matches, show candidates and ask the user to pick.
-   - If no match or no ready tasks, tell the user and stop.
-   - If no argument was given, show the ready list and ask which task to start.
+   - If no match or no open issues, tell the user and stop.
+   - **If no argument was given**, display the issue list and ask the user which issue to start. Use `AskUserQuestion` to prompt for selection.
 
-3. **Show task details** before claiming:
+3. **Show issue details** before claiming:
    ```bash
-   bd show <id> --json
+   glab issue view <number>
    ```
-   Display: title, description, priority, dependencies, spec link (if any).
+   Display: title, description, labels, milestone, linked MRs (if any).
 
-4. **Claim the task** — atomically set assignee + in_progress:
+4. **Assign the issue** to yourself:
    ```bash
-   bd update <id> --claim --json
+   glab issue update <number> --assignee @me
    ```
-   This is a single atomic command. Do NOT use separate assign + status update.
 
 5. **Create a task branch** — checkout a new branch:
-   - Derive a short kebab-case slug from the task title
-   - Choose prefix based on task type/nature:
+   - Derive a short kebab-case slug from the issue title
+   - Include the issue number for traceability
+   - Choose prefix based on issue labels or nature:
      - `feat/` — feature
      - `fix/` — bug
      - `build/` — build system, CI
      - `test/` — tests
      - `chore/` — maintenance, refactoring, docs
-   - Create the branch: `git checkout -b <prefix>/<slug>`
+   - Create the branch: `git checkout -b <prefix>/<issue-number>-<slug>`
    - If unsure which prefix, ask the user.
 
-6. **Check for a linked spec** — inspect the `bd show` JSON output:
-   - Check for a `design` field first. If present, read that file.
-   - Fall back to `spec_id` if `design` is absent. If present, read that file.
-   - If neither exists, proceed without a spec.
+6. **Check for linked design docs** — inspect the issue description:
+   - Look for links to files in `docs/specs/` or `docs/plans/`
+   - If found, read those files for context.
+   - If no spec or design doc exists, ask the user: "No spec found for this issue. Would you like to create one before starting implementation?"
+     - If yes, invoke the `/architect` skill to design the approach first.
+     - If no, proceed to brainstorming.
 
-7. **Load project context** — run `bd prime` to get AI-optimized workflow context:
-   ```bash
-   bd prime
-   ```
-   Review the output for relevant project state (open blockers, related issues, recent activity). Use this context to inform the implementation plan in plan mode.
-
-8. **Enter plan mode** — use `EnterPlanMode` to begin planning the implementation:
-   - Read the spec (if one exists) and relevant source files
-   - Understand the current codebase state for affected areas
-   - Design the implementation approach
-   - Present a step-by-step plan for user approval
+7. **Brainstorm the approach** — invoke `superpowers:brainstorming` to explore:
+   - What the issue requires
+   - Relevant codebase areas and existing patterns
+   - Implementation options and trade-offs
+   - Follow the brainstorming skill's process to reach alignment with the user before writing code

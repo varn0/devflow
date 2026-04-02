@@ -1,6 +1,6 @@
 {
   "name": "varno-devflow",
-  "description": "Parallel workspace development workflows with architect, task tracking (beads), and multi-worktree support",
+  "description": "Parallel workspace development workflows with architect, GitLab issue tracking (glab), and multi-worktree support",
   "version": "0.1.0",
   "author": {
     "name": "CucoStudio"

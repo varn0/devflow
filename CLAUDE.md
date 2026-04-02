@@ -1,6 +1,6 @@
 # varno-devflow
 
-Claude Code plugin for parallel workspace development using git worktrees, architecture-first design, and beads (bd) task tracking.
+Claude Code plugin for parallel workspace development using git worktrees, architecture-first design, and GitLab issue tracking via `glab`.
 
 ## Project structure
 
@@ -22,6 +22,6 @@ docs/             Specs and implementation plans
 ## Development guidelines
 
 - Each agent/skill file must be self-contained — no dependency on project-specific CLAUDE.md.
-- Skills use `bd` CLI for task tracking; always check `bd` is available before invoking.
+- Skills use `glab` CLI for GitLab issue tracking; always check `glab` is available before invoking.
 - Keep tasks small for simple merges and frequent integration.
 - Specs go in `docs/specs/`, plans in `docs/plans/`, prefixed with date (YYYY-MM-DD).
