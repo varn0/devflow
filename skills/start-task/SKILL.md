@@ -1,6 +1,6 @@
 ---
 name: start-task
-description: List open GitLab issues, let user pick one, create a worktree with a task branch, rebase from main, and brainstorm the approach.
+description: List open GitLab issues, let user pick one, create a worktree from main, and brainstorm the approach.
 user-invocable: true
 argument-hint: [issue number or title substring]
 ---
@@ -40,12 +40,7 @@ Start implementing a task tracked as a GitLab issue.
    glab issue update <number> --assignee @me
    ```
 
-4. **Note current position** — check which branch you're on:
-   ```bash
-   git branch --show-current
-   ```
-
-5. **Create a worktree with task branch** — use `superpowers:using-git-worktrees` to create an isolated workspace:
+4. **Create a worktree from main** — use `superpowers:using-git-worktrees` to create an isolated workspace branching off `main`:
    - Derive a short kebab-case slug from the issue title
    - Include the issue number for traceability
    - Choose prefix based on issue labels or nature:
@@ -56,16 +51,9 @@ Start implementing a task tracked as a GitLab issue.
      - `chore/` — maintenance, refactoring, docs
    - Branch name format: `<prefix>/<issue-number>-<slug>`
    - If unsure which prefix, ask the user.
-   - The worktree skill handles directory selection and safety checks.
+   - The worktree is always created from `main`, regardless of the current branch or repo state. No rebase needed.
 
-6. **Rebase from main** — inside the new worktree, bring up to date:
-   ```bash
-   git rebase main
-   ```
-   - Rebase against **local** `main` (not `origin/main`), since local main may have commits not yet pushed.
-   - If conflicts occur, stop and inform the user. Do NOT force-resolve.
-
-7. **Brainstorm the approach** — invoke `superpowers:brainstorming` to explore:
+5. **Brainstorm the approach** — invoke `superpowers:brainstorming` to explore:
    - What the issue requires
    - Relevant codebase areas and existing patterns
    - Implementation options and trade-offs
