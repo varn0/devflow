@@ -1,6 +1,6 @@
 ---
 name: start-task
-description: List open GitLab issues, let user pick one, create a worktree from main, and brainstorm the approach.
+description: List open GitLab issues, let user pick one, create a worktree or branch from main, and brainstorm the approach.
 user-invocable: true
 argument-hint: [issue number or title substring]
 ---
@@ -40,7 +40,13 @@ Start implementing a task tracked as a GitLab issue.
    glab issue update <number> --assignee @me
    ```
 
-4. **Create a worktree from main** — use `superpowers:using-git-worktrees` to create an isolated workspace branching off `main`:
+4. **Choose workspace mode** — ask the user whether to:
+   - **(a) Create a worktree** — isolated workspace (recommended for parallel development)
+   - **(b) Just create/switch to a branch** — stay in the current working directory
+
+   Use `AskUserQuestion` to prompt: "Create a worktree (isolated workspace) or just switch to a new branch?"
+
+   **Branch naming** (applies to both modes):
    - Derive a short kebab-case slug from the issue title
    - Include the issue number for traceability
    - Choose prefix based on issue labels or nature:
@@ -51,7 +57,13 @@ Start implementing a task tracked as a GitLab issue.
      - `chore/` — maintenance, refactoring, docs
    - Branch name format: `<prefix>/<issue-number>-<slug>`
    - If unsure which prefix, ask the user.
-   - The worktree is always created from `main`, regardless of the current branch or repo state. No rebase needed.
+
+   **If worktree:** use `superpowers:using-git-worktrees` to create an isolated workspace branching off `main`. The worktree is always created from `main`, regardless of the current branch or repo state.
+
+   **If branch only:** create and checkout the branch from `main`:
+   ```bash
+   git checkout -b <branch-name> main
+   ```
 
 5. **Brainstorm the approach** — invoke `superpowers:brainstorming` to explore:
    - What the issue requires
