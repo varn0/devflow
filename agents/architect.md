@@ -33,7 +33,7 @@ You MUST use TaskCreate to create a task for each of these items BEFORE starting
 6. **Write spec document and create issues** — save spec to `docs/specs/` (or wherever the project keeps specs), commit, then create implementation tasks in the project's issue tracker (best-effort, not a gate)
 7. **Spec review loop** — dispatch a general-purpose subagent to review the spec for completeness and consistency; fix issues and re-dispatch until approved (max 3 iterations, then surface to human)
 8. **User reviews written spec** — ask user to review the spec file before proceeding
-9. **Transition to implementation** — invoke writing-plans skill to create implementation plan
+9. **Transition to implementation** — detect superpowers plugin; if available invoke writing-plans skill, otherwise use Claude's built-in plan mode
 
 ## Process Flow
 
@@ -50,7 +50,9 @@ digraph architect {
     "Spec review loop" [shape=box];
     "Spec review passed?" [shape=diamond];
     "User reviews spec?" [shape=diamond];
+    "Superpowers plugin\navailable?" [shape=diamond];
     "Invoke writing-plans skill" [shape=doublecircle];
+    "Enter plan mode\nand continue" [shape=doublecircle];
 
     "Explore project context" -> "Too large for one spec?";
     "Too large for one spec?" -> "Decompose into sub-features" [label="yes"];
@@ -66,11 +68,13 @@ digraph architect {
     "Spec review passed?" -> "Spec review loop" [label="issues found,\nfix and re-dispatch"];
     "Spec review passed?" -> "User reviews spec?" [label="approved"];
     "User reviews spec?" -> "Write spec document" [label="changes requested"];
-    "User reviews spec?" -> "Invoke writing-plans skill" [label="approved"];
+    "User reviews spec?" -> "Superpowers plugin\navailable?" [label="approved"];
+    "Superpowers plugin\navailable?" -> "Invoke writing-plans skill" [label="yes"];
+    "Superpowers plugin\navailable?" -> "Enter plan mode\nand continue" [label="no"];
 }
 ```
 
-**The terminal state is invoking writing-plans.** Do NOT invoke frontend-design, mcp-builder, or any other implementation skill. The ONLY skill you invoke after architecture is writing-plans.
+**The terminal state is transitioning to implementation planning.** Do NOT invoke frontend-design, mcp-builder, or any other implementation skill. After architecture, you either invoke writing-plans (if superpowers plugin is available) or enter plan mode (if not). See the "Implementation" section for detection logic.
 
 ## The Process
 
@@ -207,8 +211,15 @@ Wait for the user's response. If they request changes, make them and re-run the 
 
 **Implementation:**
 
-- Invoke the writing-plans skill to create a detailed implementation plan
-- Do NOT invoke any other skill. writing-plans is the next step.
+Detect whether the superpowers plugin is installed, then branch:
+
+1. **Check for superpowers plugin:** Use Glob to look for the writing-plans skill file at `~/.claude/plugins/cache/claude-plugins-official/superpowers/*/skills/writing-plans/SKILL.md`. If any match is found, the plugin is available.
+
+2. **If superpowers IS available:** Invoke the `superpowers:writing-plans` skill to create a detailed implementation plan. This is the preferred path — it produces structured, task-by-task plans with TDD and execution handoff.
+
+3. **If superpowers is NOT available:** Use the `EnterPlanMode` tool to enter Claude's built-in plan mode, then create the implementation plan inline. Structure it with the spec as context: break down into phases, list files to modify, define testing strategy, and proceed with implementation once the user approves the plan.
+
+- Do NOT invoke any other implementation skill (frontend-design, mcp-builder, etc.) — the only next step is implementation planning via one of the two paths above.
 
 ## Key Architectural Principles
 
