@@ -13,7 +13,6 @@
 | Agent | Model | Use for |
 |-------|-------|---------|
 | `architect` | opus | Architecture decisions, feature design, spec writing |
-| `frontend-engineer` | sonnet | Frontend implementation from specs with testing |
 
 ## Task Tracking
 This plugin uses GitLab issues via `glab` CLI for task tracking. If `glab` is not installed, skills will prompt you to install it.

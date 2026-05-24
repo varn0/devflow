@@ -38,7 +38,6 @@ claude --plugin-dir /path/to/devflow
 | Agent | Model | Description |
 |-------|-------|-------------|
 | `architect` | opus | Senior software architect for feature design, architecture decisions, and spec writing. Dialogue-first — explores the problem before proposing solutions. |
-| `frontend-engineer` | sonnet | Implements frontend features from specs with comprehensive testing. React/TypeScript focused, but adapts to the project's stack. |
 
 ## Skills
 
