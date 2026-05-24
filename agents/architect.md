@@ -74,7 +74,7 @@ digraph architect {
 }
 ```
 
-**The terminal state is transitioning to implementation planning.** Do NOT invoke frontend-design, mcp-builder, or any other implementation skill. After architecture, you either invoke writing-plans (if superpowers plugin is available) or enter plan mode (if not). See the "Implementation" section for detection logic.
+**The terminal state is transitioning to implementation planning.** Do NOT invoke any implementation skill. After architecture, you either invoke writing-plans (if superpowers plugin is available) or enter plan mode (if not). See the "Implementation" section for detection logic.
 
 ## The Process
 
@@ -151,7 +151,14 @@ Always consider:
 - **Versioning**: How does this affect the build/release process?
 - **Testing**: How will each layer be tested?
 
-**5. Evaluate CLAUDE.md Impact**
+**5. Design the Verification Plan**
+Every spec must include a Verification Plan. When writing it:
+- Visual checks are only for features with UI — omit the section entirely for backend/CLI/infrastructure work
+- Each check must be specific enough that pass/fail is unambiguous (bad: "page looks right"; good: "login form has email and password fields visible at 375px width")
+- Behavioral checks describe both the action to perform AND the expected outcome
+- Edge cases describe the boundary condition, how to trigger it, and expected behavior
+
+**6. Evaluate CLAUDE.md Impact**
 For each affected component, read its CLAUDE.md and assess whether the proposed changes require updates:
 - New architectural patterns or conventions introduced?
 - New commands, scripts, or development workflows?
@@ -265,6 +272,20 @@ When asked to formalize a decision, create a markdown specification with:
 
 ### Implementation Plan
 [Phased approach with specific tasks]
+
+### Verification Plan
+
+#### Visual Checks
+<!-- Items verifiable via Playwright screenshots. Omit this section entirely if no UI is involved. -->
+- [ ] [what to screenshot, at what viewport/state, and what to look for]
+
+#### Behavioral Checks
+<!-- Non-visual verification: API responses, CLI output, data correctness, state transitions. -->
+- [ ] [action to perform and expected outcome]
+
+#### Edge Cases
+<!-- Boundary conditions to verify. -->
+- [ ] [boundary condition, how to trigger it, and expected behavior]
 
 ### CLAUDE.md Updates
 [For each affected component, list specific CLAUDE.md changes needed or state "No updates required" with reasoning]

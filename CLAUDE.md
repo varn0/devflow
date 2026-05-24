@@ -8,7 +8,7 @@ Claude Code plugin for parallel workspace development using git worktrees, archi
 .claude-plugin/   Plugin manifest (plugin.json, marketplace.json)
 hooks/            SessionStart hook that injects reference card
 agents/           architect.md (Opus)
-skills/           /architect, /start-task, /close-task, /merge-workspace, /visual-qa
+skills/           /architect, /start-task, /close-task, /merge-workspace, /visual-qa, /verify-spec
 docs/             Specs and implementation plans
 ```
 
