@@ -21,7 +21,7 @@ digraph verify {
     "Run behavioral checks" [shape=box];
     "Run edge case checks" [shape=box];
     "NEVER auto-pass" [shape=octagon, style=filled, fillcolor=red, fontcolor=white];
-    "Display summary table" [shape=doublecircle];
+    "Display summary table\n+ cleanup screenshots" [shape=doublecircle];
 
     "Locate spec" -> "Has Verification Plan?";
     "Has Verification Plan?" -> "Stop: no plan found" [label="no"];
@@ -32,7 +32,7 @@ digraph verify {
     "Run visual checks\nwith screenshots" -> "Run behavioral checks";
     "Convert visual checks\nto manual" -> "Run behavioral checks";
     "Run behavioral checks" -> "Run edge case checks";
-    "Run edge case checks" -> "Display summary table";
+    "Run edge case checks" -> "Display summary table\n+ cleanup screenshots";
 }
 ```
 
@@ -42,7 +42,8 @@ digraph verify {
 
 - If `$ARGUMENTS` is a file path, use it.
 - Otherwise, discover the most recent spec:
-  - Glob `docs/specs/*.md`, sort by filename (date-prefixed by convention), pick the latest.
+  - Glob `docs/**/specs/*.md` (covers `docs/specs/`, `docs/superpowers/specs/`, etc.)
+  - Sort by filename (date-prefixed by convention), pick the latest.
   - Show the user which spec was selected. **Ask for confirmation before proceeding.**
 
 ### 2. Extract the Verification Plan
@@ -51,7 +52,19 @@ Read the spec. Look for a `## Verification Plan` or `### Verification Plan` sect
 
 **If no Verification Plan is found: STOP.** Tell the user and stop. Do NOT improvise checks, infer checks from the spec body, or offer to create a plan. The plan must exist in the spec before this skill can run.
 
-Parse into three lists: **Visual Checks**, **Behavioral Checks**, **Edge Cases**. Empty sections are fine — skip them silently.
+**Categorizing checks:**
+
+If the plan uses subsections (`#### Visual Checks`, `#### Behavioral Checks`, `#### Edge Cases`), use those directly.
+
+If the plan is a flat list (numbered or bulleted), categorize each item:
+
+| Check involves... | Category |
+|---|---|
+| UI rendering, layout, visual appearance, responsiveness | Visual |
+| Navigation, links, i18n, feature flags, user interactions | Behavioral |
+| Boundary conditions, error states, code checks, build/lint | Edge Cases |
+
+Present your categorization to the user before starting. Don't ask for approval — just show it so they know the order.
 
 ### 3. Detect Playwright
 
@@ -67,7 +80,7 @@ Process checks in order: Visual, then Behavioral, then Edge Cases.
 **For each visual check:**
 1. Announce the check.
 2. Take Playwright screenshots at relevant viewports/states described in the check item.
-3. Present screenshots to the user.
+3. Present screenshots to the user (use Read tool to display inline).
 4. Ask: **"Pass, fail, or skip?"**
 5. Record the user's answer.
 
@@ -76,6 +89,14 @@ Process checks in order: Visual, then Behavioral, then Edge Cases.
 2. If the check describes something Claude can execute (run a command, read a file, call an API), do it and show the output alongside the expected outcome.
 3. Ask: **"Pass, fail, or skip?"**
 4. Record the user's answer.
+
+**Accepting user responses:**
+
+Accept shorthand: `p` = pass, `f` = fail, `s` = skip. Also accept full words and mixed case.
+
+**"Pass with noted issue" pattern:**
+
+If the user passes but mentions a bug or improvement (e.g., "pass but the pluralization is wrong"), record it as **pass** and add the issue to a **Noted Issues** list in the summary. These are non-blocking problems discovered during verification that should be fixed but don't fail the check.
 
 ### 5. Display Summary
 
@@ -91,12 +112,18 @@ Process checks in order: Visual, then Behavioral, then Edge Cases.
 
 ### Failed Checks
 - [Visual] Login form alignment on mobile — misaligned at 375px width
+
+### Noted Issues (non-blocking)
+- [Visual] Event counter shows singular instead of plural — pluralization key incorrect
 ```
 
 If all pass: "All checks passed. Feature is verified."
 If any fail: list them with category and notes.
+If noted issues exist: list them separately — these are bugs to fix but don't block verification.
 
 Results are **ephemeral** — shown in-session only, not written to files.
+
+**Cleanup:** After displaying the summary, delete any screenshot files created during verification (e.g., `verify-*.png`). These are temporary artifacts.
 
 ## The Iron Rule: You Do NOT Judge
 
