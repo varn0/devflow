@@ -8,7 +8,7 @@
 | `/close-task` | Wrap up work, push, create MR (issue closes on merge) |
 | `/merge-workspace` | Merge a worktree branch into main |
 | `/visual-qa` | Visual QA with Playwright screenshots |
-| `/verify-spec` | Verify a feature against its spec's Verification Plan |
+| `/verify-work` | Verify a feature against its spec's Verification Plan |
 
 ## Available Agents
 | Agent | Model | Use for |

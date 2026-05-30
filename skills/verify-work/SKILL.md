@@ -1,5 +1,5 @@
 ---
-name: verify-spec
+name: verify-work
 description: Use when a feature implementation is complete and needs verification against its spec's Verification Plan before closing. Also use when the user asks to verify, validate, or QA a feature against a spec.
 user-invocable: true
 argument-hint: [path to spec file]
