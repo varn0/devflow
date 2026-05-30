@@ -1,0 +1,42 @@
+#!/bin/bash
+# Post-commit hook: auto-bump patch version in plugin.json and marketplace.json
+# after each commit to main (except bump commits themselves).
+
+branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+if [ "$branch" != "main" ]; then
+  exit 0
+fi
+
+# Skip if this commit is already a version bump
+last_msg=$(git log -1 --format=%s)
+if echo "$last_msg" | grep -q "^chore: bump version to"; then
+  exit 0
+fi
+
+PLUGIN_JSON=".claude-plugin/plugin.json"
+MARKETPLACE_JSON=".claude-plugin/marketplace.json"
+
+if [ ! -f "$PLUGIN_JSON" ]; then
+  exit 0
+fi
+
+current_version=$(grep -oE '"version": *"[^"]*"' "$PLUGIN_JSON" | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+
+if [ -z "$current_version" ]; then
+  exit 0
+fi
+
+major=$(echo "$current_version" | cut -d. -f1)
+minor=$(echo "$current_version" | cut -d. -f2)
+patch=$(echo "$current_version" | cut -d. -f3)
+new_patch=$((patch + 1))
+new_version="$major.$minor.$new_patch"
+
+sed -i '' "s/\"version\": *\"$current_version\"/\"version\": \"$new_version\"/" "$PLUGIN_JSON"
+
+if [ -f "$MARKETPLACE_JSON" ]; then
+  sed -i '' -E "s/\"version\": *\"[0-9]+\.[0-9]+\.[0-9]+\"/\"version\": \"$new_version\"/" "$MARKETPLACE_JSON"
+fi
+
+git add "$PLUGIN_JSON" "$MARKETPLACE_JSON" 2>/dev/null
+git commit -m "chore: bump version to $new_version" --no-verify
