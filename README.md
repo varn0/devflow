@@ -49,6 +49,9 @@ claude --plugin-dir /path/to/devflow
 | `merge-workspace` | `/merge-workspace` | Merge a git worktree branch into main with preview and confirmation |
 | `visual-qa` | `/visual-qa` | Visual QA testing with Playwright screenshots |
 | `write-release-notes` | `/write-release-notes` | Generate user-friendly release notes from git history since last tag |
+| `run-services` | `/run-services` | Start/stop/check a project's dev services and find or tail their logs via [devcli](https://github.com/varn0/devcli) |
+
+> **`run-services` requires [devcli](https://github.com/varn0/devcli)** — the standard runner for local dev services. The skill is tool-scoped: it drives devcli (start/stop/status, per-service logs, orphan/port cleanup) and defers app-specific launch modes and log locations to a project-local skill, and devcli's full flag reference to `devcli docs`. Because it lives in the plugin, it loads in every repo where the plugin is enabled, so agents don't need to be told how a dev app was launched or where its logs are.
 
 ## Parallel Workspace Workflow
 
