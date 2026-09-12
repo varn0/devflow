@@ -9,6 +9,7 @@
 | `/merge-workspace` | Merge a worktree branch into main |
 | `/visual-qa` | Visual QA with Playwright screenshots |
 | `/verify-work` | Verify a feature against its spec's Verification Plan |
+| `/security-scan` | Run security scanners, merge + dedupe findings into one report (detect-only) |
 
 ## Available Agents
 | Agent | Model | Use for |
