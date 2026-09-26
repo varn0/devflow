@@ -65,9 +65,15 @@ Start implementing a task tracked as a GitLab issue.
    git checkout -b <branch-name> main
    ```
 
-5. **Brainstorm the approach** — invoke `superpowers:brainstorming` to explore:
+5. **Design/brainstorm the approach** — pick the design process based on what's available:
+
+   **First, check whether an `architect` skill is present.** Look for it in the available skills list (e.g. `architect` or `<plugin>:architect`, such as `varno-devflow:architect`). If found, invoke that skill to drive the design discussion — it enforces the architecture-first gate before implementation.
+
+   **If no `architect` skill is present, fall back to `superpowers:brainstorming`.**
+
+   Either way, explore:
    - What the issue requires
    - Relevant codebase areas and existing patterns
    - Implementation options and trade-offs
-   - If the issue description links to files in `docs/specs/` or `docs/plans/`, read those for context before brainstorming.
-   - Follow the brainstorming skill's process to reach alignment with the user before writing code
+   - If the issue description links to files in `docs/specs/` or `docs/plans/`, read those for context first.
+   - Follow the chosen skill's process to reach alignment with the user before writing code
