@@ -33,7 +33,19 @@ Issues close automatically when the MR merges (via `Closes #N` in the MR descrip
    - If verification fails, stop — the user should fix before proceeding.
    - If no spec is referenced in the issue, skip this step silently.
 
-4. **Run unit tests** — gate the push on passing tests:
+4. **Run the checks gate** — gate the push on a green lint/test run.
+
+   **First, look for a repo checks script. If one exists, it IS the gate — run it and skip the manual discovery below.** Some repos have no CI and instead ship a single script that runs every linter (and optionally the test suites) with the project's own scoping rules. Prefer it over ad-hoc detection, because it encodes decisions the repo already made (which linters, changed-file scoping, known-failing suites to skip).
+
+   Check, in order, for:
+   - `scripts/check.sh` (run `scripts/check.sh` — it defaults to linting only the areas the branch changed)
+   - `bin/check` or `./check.sh`
+   - a `check` / `lint` target in a `Makefile` (`make check`)
+   - a `check`/`lint` script in `package.json` (`npm run check`)
+
+   Run the first one found from the repo root. If it exits non-zero, treat it exactly like a failing test run (show output, ask the user how to proceed — fix and re-run, or push anyway). If the script supports a heavier mode (e.g. `scripts/check.sh --tests` to also run unit suites), offer it but do not force it.
+
+   **If NO checks script exists, fall back to manual discovery:**
 
    **Detect what changed:**
    ```bash
