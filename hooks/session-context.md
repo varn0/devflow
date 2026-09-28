@@ -4,7 +4,8 @@
 | Command | Description |
 |---------|-------------|
 | `/architect` | Start an architectural discussion about a feature |
-| `/start-task` | List GitLab issues (glab), pick one, create branch, brainstorm |
+| `/implement-task` | Pick a GitLab issue → brainstorm → optional architect spec → plan → implement |
+| `/start-task` | Alias for `/implement-task` (backwards compatibility) |
 | `/close-task` | Wrap up work, push, create MR (issue closes on merge) |
 | `/merge-workspace` | Merge a worktree branch into main |
 | `/visual-qa` | Visual QA with Playwright screenshots |

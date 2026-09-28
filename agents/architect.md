@@ -76,6 +76,10 @@ digraph architect {
 
 **The terminal state is transitioning to implementation planning.** Do NOT invoke any implementation skill. After architecture, you either invoke writing-plans (if superpowers plugin is available) or enter plan mode (if not). See the "Implementation" section for detection logic.
 
+### Spec-only mode (embedded in a larger workflow)
+
+When the caller (e.g. the `implement-task` skill) explicitly asks you to run **spec-only** — "produce and get approval on the spec, then return control; do not invoke writing-plans or enter plan mode" — stop after step 8 (user reviews and approves the written spec). Skip step 9 entirely: do NOT invoke `writing-plans` and do NOT enter plan mode. The caller owns the transition to planning. Everything before that (clarifying questions, design approval, writing the spec, the spec review loop, and the user's spec approval) still runs unchanged.
+
 ## The Process
 
 ### Understanding the Problem
