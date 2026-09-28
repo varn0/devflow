@@ -44,7 +44,7 @@ claude --plugin-dir /path/to/devflow
 | Skill | Command | Description |
 |-------|---------|-------------|
 | `architect` | `/architect` | Start an architectural discussion about a feature or problem |
-| `implement-task` | `/implement-task` | Pick a GitLab issue, brainstorm, optionally formalize a spec via the architect, write a plan, and implement (architect review + subagent-driven dev are toggleable up front) |
+| `implement-task` | `/implement-task` | Pick a GitLab issue, brainstorm, optionally formalize a spec via the architect, write a plan, implement, and (optionally) finish up by pushing + opening the MR via close-task (architect review + subagent-driven dev + finish-up are toggleable up front) |
 | `start-task` | `/start-task` | Backwards-compatibility alias for `/implement-task` |
 | `close-task` | `/close-task` | Mark a task as done in the plan file and commit |
 | `merge-workspace` | `/merge-workspace` | Merge a git worktree branch into main with preview and confirmation |

@@ -9,12 +9,13 @@ Take a GitLab issue from selection through design, planning, and implementation.
 
 ## Overview
 
-This skill orchestrates a full task pipeline: pick an issue, brainstorm the approach, optionally formalize it with the architect (spec), turn the spec/approach into a plan, then implement. Two stages are optional and chosen up front:
+This skill orchestrates a full task pipeline: pick an issue, brainstorm the approach, optionally formalize it with the architect (spec), turn the spec/approach into a plan, implement, then wrap up (push + MR). Three stages are optional and chosen up front:
 
 - **Architect review** — the `architect` skill produces and gets approval on a written spec.
 - **Subagent-driven development** — the plan is executed via `superpowers:subagent-driven-development`.
+- **Finish up** — when implementation is done, invoke the `close-task` skill to run the checks gate, push, and open the MR.
 
-By default both are ON. The user can turn either off at the start.
+By default all three are ON. The user can turn any off at the start. The up-front "Finish up" choice is the authorization for the outward-facing push + MR, so the happy path runs hands-off from "code done" to "MR up" with no mid-flow prompt — while the failure gates inside `close-task` (failing checks or verification) still stop and ask.
 
 ## Prerequisites Check
 
@@ -44,13 +45,13 @@ If not found or not authenticated, tell the user to install/configure `glab`. Do
 
 3. **Choose the execution mode** — ask this up front, before any design or implementation work begins. Use `AskUserQuestion`:
 
-   > "Implement with defaults (architect review + subagent-driven development), or change one of those options?"
+   > "Implement with defaults (architect review + subagent-driven development + finish up with push & MR), or change any of those options?"
 
-   - **Defaults** → architect review ON, subagent-driven development ON.
-   - **Change options** → ask a follow-up `AskUserQuestion` (multi-select): "Which stages should be enabled?" with options **Architect review** and **Subagent-driven development**. Enabled = selected; unselected = OFF.
-     - If the user selects **neither**, confirm explicitly before proceeding ("This runs a plain brainstorm → plan → direct implementation with no architect spec and no subagents — is that what you want?"). Don't silently proceed with both off.
+   - **Defaults** → architect review ON, subagent-driven development ON, finish up ON.
+   - **Change options** → ask a follow-up `AskUserQuestion` (multi-select): "Which stages should be enabled?" with options **Architect review**, **Subagent-driven development**, and **Finish up (push + MR)**. Enabled = selected; unselected = OFF.
+     - If the resulting selection is surprising (e.g. architect **and** subagents both off, or nothing selected at all), confirm explicitly before proceeding rather than silently running a stripped-down flow.
 
-   Record both toggles — they gate steps 6 and 8.
+   Record all three toggles — they gate steps 6, 8, and 9.
 
 4. **Choose workspace mode** — ask (`AskUserQuestion`): create an isolated **worktree** (recommended for parallel development) or just a **branch** in the current directory.
 
@@ -83,6 +84,16 @@ If not found or not authenticated, tell the user to install/configure `glab`. Do
    - **Subagent-driven development ON** *(default)* → invoke `superpowers:subagent-driven-development` to execute the plan in this session via subagents.
    - **Subagent-driven development OFF** → implement the plan directly in this session yourself, following `superpowers:test-driven-development` (tests first). Do NOT use `superpowers:executing-plans` here — that skill is for handing the plan to a separate session; only reach for it if the user explicitly wants a separate reviewed execution session.
 
+9. **Finish up** *(only if enabled in step 3)* — invoke the `close-task` skill to wrap up: run the checks gate, push the branch, and open the MR.
+
+   Pass the issue number and branch already known from steps 1–4 so `close-task` skips its own re-identification. Do NOT re-derive them. **If the architect produced a spec in step 6, also pass its path** so `verify-work` runs against it even when the issue body doesn't link the spec (`close-task` otherwise only verifies when the issue references a spec).
+
+   **The finish-up toggle authorizes pushing and opening the MR for a PASSING result** — on the green path, do not add a separate "shall I push?" prompt. It does NOT pre-authorize anything else: if the checks gate or `verify-work` fails, `close-task` is a **hard stop** — it shows the output and does not push. The user fixes and re-runs; there is no "push anyway" path, and the up-front toggle never overrides a red gate.
+
+   **Loop back to next work:** after the MR is up, `close-task` suggests the user's other open issues. If the user picks one, start it by invoking this skill (`implement-task`) again for that issue.
+
+   **If disabled:** stop after implementation. Tell the user the branch is ready and that they can run `/close-task` when they want to push and open the MR.
+
 ## Quick Reference
 
 | Step | Skill / tool | Conditional? |
@@ -94,6 +105,7 @@ If not found or not authenticated, tell the user to install/configure `glab`. Do
 | Architect (spec-only) | `architect` skill | if enabled |
 | Plan | `superpowers:writing-plans` | always |
 | Implement | `superpowers:subagent-driven-development` (ON) / `superpowers:test-driven-development` direct (OFF) | mode-dependent |
+| Finish up (push + MR) | `close-task` skill | if enabled |
 
 ## Common Mistakes
 
@@ -101,3 +113,5 @@ If not found or not authenticated, tell the user to install/configure `glab`. Do
 - **Letting the architect run to plan mode** — when enabled, the architect runs spec-only; this skill owns `writing-plans`.
 - **Double-planning** — `writing-plans` runs exactly once (step 7), not inside the architect.
 - **Skipping brainstorming** — it always runs, even when the architect is enabled.
+- **Adding a mid-flow push prompt** — the finish-up toggle authorizes the push on a *passing* result; don't ask "shall I push?" again on the green path. A failing checks gate or verify-work is a hard stop — `close-task` shows the output and does not push. There is no "push anyway" path.
+- **Re-deriving issue/branch in finish-up** — pass what steps 1–4 already know to `close-task`.

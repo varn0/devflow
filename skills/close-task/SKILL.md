@@ -43,7 +43,7 @@ Issues close automatically when the MR merges (via `Closes #N` in the MR descrip
    - a `check` / `lint` target in a `Makefile` (`make check`)
    - a `check`/`lint` script in `package.json` (`npm run check`)
 
-   Run the first one found from the repo root. If it exits non-zero, treat it exactly like a failing test run (show output, ask the user how to proceed — fix and re-run, or push anyway). If the script supports a heavier mode (e.g. `scripts/check.sh --tests` to also run unit suites), offer it but do not force it.
+   Run the first one found from the repo root. If it exits non-zero, treat it exactly like a failing test run: show the output and **stop — do NOT push**. The gate must be green before the branch is pushed; there is no "push anyway" override. If the script supports a heavier mode (e.g. `scripts/check.sh --tests` to also run unit suites), offer it but do not force it.
 
    **If NO checks script exists, fall back to manual discovery:**
 
@@ -69,9 +69,7 @@ Issues close automatically when the MR merges (via `Closes #N` in the MR descrip
    - Both → run both.
    - If no test framework is detected for a given area, warn the user and skip (don't block the push for missing tests).
 
-   **If tests fail:** Show the output, ask the user how to proceed. Options:
-   - Fix and re-run (do NOT auto-fix — the user controls the code).
-   - Push anyway (user override — their call).
+   **If tests fail:** Show the output and **stop — do NOT push**. A failing checks gate is a hard stop, exactly like a failed spec verification (step 3). The user fixes and re-runs (do NOT auto-fix — the user controls the code). There is no "push anyway" override; the gate must be green before the branch is pushed.
 
 5. **Push the branch:**
    ```bash
@@ -101,7 +99,7 @@ Issues close automatically when the MR merges (via `Closes #N` in the MR descrip
      ```bash
      glab issue list --assignee=none --per-page=5
      ```
-   - Ask if they want to start one (which would be a `/start-task` invocation).
+   - Ask if they want to start one (which would be an `/implement-task` invocation).
 
 ## What This Skill Does NOT Do
 

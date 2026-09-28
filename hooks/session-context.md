@@ -4,7 +4,7 @@
 | Command | Description |
 |---------|-------------|
 | `/architect` | Start an architectural discussion about a feature |
-| `/implement-task` | Pick a GitLab issue → brainstorm → optional architect spec → plan → implement |
+| `/implement-task` | Pick a GitLab issue → brainstorm → optional architect spec → plan → implement → optional finish (push + MR) |
 | `/start-task` | Alias for `/implement-task` (backwards compatibility) |
 | `/close-task` | Wrap up work, push, create MR (issue closes on merge) |
 | `/merge-workspace` | Merge a worktree branch into main |
